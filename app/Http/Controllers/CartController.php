@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB ;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Shopper\Core\Models\Product;
 
@@ -12,33 +12,33 @@ class CartController extends Controller
         return view('cart.index');
     }
 
-   
-public function add($id)
-{
-    dd(session()->get('cart'));
-    $product = \DB::table('sh_products')->where('id', $id)->first();
 
-    if (!$product) {
-        return back()->with('error', 'Product not found');
+    public function add($id)
+    {
+        dd(session()->get('cart'));
+        $product = \DB::table('sh_products')->where('id', $id)->first();
+
+        if (!$product) {
+            return back()->with('error', 'Product not found');
+        }
+
+        $cart = session()->get('cart', []);
+
+        if (isset($cart[$id])) {
+            $cart[$id]['qty']++;
+        } else {
+            $cart[$id] = [
+                "name" => $product->name,
+                "price" => 0,
+                "qty" => 1
+            ];
+        }
+
+        session()->put('cart', $cart);
+
+        // 👇 IMPORTANT CHANGE HERE
+        return redirect('/cart')->with('success', 'Product added to cart');
     }
-
-    $cart = session()->get('cart', []);
-
-    if (isset($cart[$id])) {
-        $cart[$id]['qty']++;
-    } else {
-        $cart[$id] = [
-            "name" => $product->name,
-            "price" => 0,
-            "qty" => 1
-        ];
-    }
-
-    session()->put('cart', $cart);
-
-    // 👇 IMPORTANT CHANGE HERE
-    return redirect('/cart')->with('success', 'Product added to cart');
-}
 
     public function update(Request $request, $id)
     {
@@ -65,16 +65,16 @@ public function add($id)
     }
 
     public function checkout(Request $request)
-{
-    $cart = session()->get('cart');
+    {
+        $cart = session()->get('cart');
 
-    if (!$cart) {
-        return redirect('/cart')->with('error', 'Cart is empty');
+        if (!$cart) {
+            return redirect('/cart')->with('error', 'Cart is empty');
+        }
+
+        // For now just clear cart (simple demo)
+        session()->forget('cart');
+
+        return redirect('/cart')->with('success', 'Order placed successfully!');
     }
-
-    // For now just clear cart (simple demo)
-    session()->forget('cart');
-
-    return redirect('/cart')->with('success', 'Order placed successfully!');
-}
 }
