@@ -425,4 +425,7 @@ PHP_Laravel12_Shopper/
 ---
 
 Your PHP_Laravel12_Shopper Project is Now ready!
+<<<<<<< HEAD
 
+=======
+>>>>>>> development
